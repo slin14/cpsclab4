@@ -1,21 +1,3 @@
-/*
- File:          recursion.c
- Purpose:       Exercises for CPSC259 lab 4
- Author:			  Your names
- Student #s:		70196886
- CWLs:		      slin14
- Date:				  Nov. 1, 2022
- */
-
- /******************************************************************
-	PLEASE EDIT THIS FILE
-
-	Comments that start with // should be replaced with code
-	Comments that are surrounded by * are hints
-	******************************************************************/
-
-
-	/* Preprocessor directives */
 #include "recursion.h"
 
 /*
