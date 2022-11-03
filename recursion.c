@@ -17,7 +17,6 @@
 
 	/* Preprocessor directives */
 #include "recursion.h"
-//#include <string.h>
 
 /*
  Calculates the power.
@@ -29,7 +28,6 @@
  */
 int calculate_power(int base, int power)
 {
-	// Replace this return statement with your own code
 	if (power == 0) {
 		return 1;
 	}
@@ -47,7 +45,6 @@ int calculate_power(int base, int power)
  */
 int count_digits(int number)
 {
-	// Replace this return statement with your own code
 	if ((number / 10) == 0) {
 		return 1;
 	}
@@ -64,7 +61,6 @@ int count_digits(int number)
  */
 int string_length(char* string)
 {
-	// Replace this return statement with your own code
 	if (string[0] == '\0') {
 		return 0;
 	}
@@ -92,7 +88,6 @@ int string_length(char* string)
  */
 int is_palindrome(char* string, int string_length)
 {
-	// Replace this return statement with your own code
 	if (string_length <= 1) {
 		return 1;
 	}
@@ -132,8 +127,6 @@ int draw_ramp(int number, char* buffer)
 	}
 	if (number == 1) {
 		ret_val = draw_row(number, buffer);
-		//strcat(buffer, "\n");
-		//return ret_val;
 	}
 	else {
 		ret_val = draw_row(number, buffer) + 1;
@@ -141,8 +134,6 @@ int draw_ramp(int number, char* buffer)
 		ret_val = ret_val + draw_ramp(number - 1, buffer);
 		strcat(buffer, "\n"); 
 		ret_val = ret_val + draw_row(number, buffer) + 1;
-		//strcat(buffer, "\n");
-		//return ret_val;
 		if (ret_val > strlen(buffer)) {
 			buffer[ret_val] = '\0';
 		}
@@ -168,14 +159,10 @@ int draw_row(int size, char* buffer)
 	}
 	else if (size == 1) {
 		strcat(buffer, "*");
-		//printf("draw_row 1, size = %d, buffer = %s\n", size, buffer);
-		//printf("draw_row 1, size = %d, buffer_len = %d\n", size, strlen(buffer));
 		return 1;
 	}
 	else {
 		strcat(buffer, "*");
-		//printf("draw_row *, size = %d, buffer = %s\n", size, buffer);
-		//printf("draw_row *, size = %d, buffer_len = %d\n", size, strlen(buffer));
 		return 1 + draw_row(size - 1, buffer);
 	}
 }
