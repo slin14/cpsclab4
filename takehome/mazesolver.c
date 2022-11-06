@@ -52,8 +52,8 @@ void process()
       a) get the size of the maze and stores it in the dimension variable
       b) copies the maze into memory */
       // INSERT YOUR CODE HERE (2 lines)
-      // dimension = ...
-      // maze = parse_maze( ...
+      dimension = get_maze_dimension(maze_file);
+      maze      = parse_maze(maze_file, dimension);
 
   }
   else {
@@ -63,10 +63,15 @@ void process()
 
   /* Traverses maze and generates all solutions */
   // INSERT YOUR CODE HERE (1 line)
-  // generate_all_paths(...
+  generate_all_paths( &paths, &paths_found, maze, dimension, 0, 0, "" );
 
   /* Calculates and displays required data */
   // INSERT YOUR CODE HERE
+  printf("Total number of solutions: %d\n", paths_found);
+  construct_shortest_path_info ( paths, paths_found, outputstring );
+  printf("Shortest path: %s\n", outputstring);
+  // printf("Cheapest path: %d\n", );
+  // printf("Cheapest path cost: %d\n", );
 }
 
 /*
@@ -93,11 +98,11 @@ int get_maze_dimension( FILE* maze_file )  {
 	   IF TRUE reduce strlen by 2 in order to omit '\r' and '\n' from each line
 	   ELSE    reduce strlen by 1 in order to omit '\n' from each line */
   if ( strchr( line_buffer, '\r' ) != NULL ) {
-    // INSERT CODE HERE (1 line)
-    // return ...
+    // printf("get_maze_dimension: maze created in Windows, dim = %d\n", strlen(line_buffer)-2);
+    return strlen(line_buffer)-2;
   } else {
-    // INSERT CODE HERE (1 line)
-    // return ...
+    // printf("get_maze_dimension: maze created in Linux, dim = %d\n", strlen(line_buffer)-1);
+    return strlen(line_buffer)-1;
   }
 }
 
@@ -124,7 +129,6 @@ int get_maze_dimension( FILE* maze_file )  {
  */
 maze_cell** parse_maze( FILE* maze_file, int dimension )
 {
-	/* Variables */
   char        line_buffer[BUFFER];
   int         row = 0;
 	int         column = 0;
@@ -132,11 +136,11 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
 
   /* Allocates memory for correctly-sized maze */
   // INSERT CODE HERE (1 line)
-  // maze = ( maze_cell ** ) calloc ... (1 line)
+  maze = ( maze_cell ** ) calloc (dimension, sizeof(maze_cell*));     // calloc(num_items, item_size)
 
   for ( row = 0; row < dimension; ++row ) {
     // INSERT CODE HERE (1 line)
-    // maze[row] = ( maze_cell* ) calloc ... (1 line)
+    maze[row] = ( maze_cell* ) calloc (dimension, sizeof(maze_cell)); // calloc(num_items, item_size)
   }
 
   /* Copies maze file to memory */
@@ -144,11 +148,20 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
   while ( fgets ( line_buffer, BUFFER, maze_file ) ) {
     for ( column = 0; column < dimension; ++column ) {
       // INSERT CODE HERE (2 lines)
-      // maze[row][column].character = ...
-      // maze[row][column].visited = ...
+      maze[row][column].character = line_buffer[column];
+      maze[row][column].visited   = 'u';                  // unvisited
 	  }
     row++;
   }
+
+  // printf("parse_maze: printing maze...\n");
+  // for (int i = 0; i<dimension; i++) {
+  //   for (int j = 0; j<dimension; j++){
+  //     printf("%c ", maze[i][j].character);
+  //   }
+  //   printf("\n");
+  // }
+
 	return maze;
 }
 
@@ -179,17 +192,22 @@ maze_cell** parse_maze( FILE* maze_file, int dimension )
  */
 void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze, int dimension, int row, int column, char* path )
 {
-	/* Variables */
 	int path_length   = 0;
 	char* new_point  = NULL;
 	char* new_path   = NULL;
 
+  // printf("generate_all_paths row = %d, col = %d\n", row, column);
+
   /* Checks for base cases */
-  if ( // INSERT CODE HERE: Simply return if we hit one of the base cases (there are more than 1)
-       // (remember to delete 1 on the next line, which is here so the incomplete program compiles)
-       1 ) {
-    return;
-	}
+  if (row < 0 || row >= dimension || column < 0 || column >= dimension) { 
+    return; // out of maze
+	} 
+  else if (maze[row][column].visited == 'v') { 
+    return; // already visited maze_cell
+  } 
+  else if (maze[row][column].character == '*') { 
+    return; // hit a wall
+  }
 
   /* Otherwise deals with the recursive case.  Pushes the current coordinate onto the path
 	  and checks to see if the right boundary of the maze has been reached
@@ -229,12 +247,12 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 			   2. Recursively search in each direction using the new path, and the same pathsetref and numpathsref
 			   3. Mark point as unvisited */
       // INSERT CODE HERE (6 lines)
-      // maze.[row][column].visited = ...
-      // generate_all_paths...
-      // generate_all_paths...
-      // generate_all_paths...
-      // generate_all_paths...
-      // maze.[row][column].visited = ...
+      maze[row][column].visited = 'v';
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column-1, path ); // left
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column+1, path ); // right
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row-1, column, path ); // up
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row+1, column, path ); // down
+      maze[row][column].visited = 'u';
 		  return;
     }
   }
@@ -253,7 +271,9 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 int path_cost ( char* path_string )
 {
   int cost = 0;
-	// INSERT CODE HERE
+	for (int i = 0; path_string[i] != '\0'; i++) {
+    cost = cost + (int)path_string[i];
+  }
   
   return cost;
 }
@@ -272,7 +292,13 @@ int path_cost ( char* path_string )
  */
 void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbuffer )
 {
-	// INSERT CODE HERE
+	int shortest_path_length = strlen(pathset[0]);
+  for (int i = 0; i < numpaths; i++) {
+    if (strlen(pathset[i]) < shortest_path_length) {
+      strcpy(outputbuffer, pathset[i]);
+    }
+  }
+  printf("construct_shortest_path_info: shortest path = %s\n", outputbuffer);
 }
 
 /*

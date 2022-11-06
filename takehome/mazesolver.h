@@ -17,7 +17,7 @@
  to the list of prototypes.
  ******************************************************************/
 
-#pragma once
+// #pragma once
 
 /* Preprocessor directives to define macros */
 #define MAZE1     "maze1.txt"

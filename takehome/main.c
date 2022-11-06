@@ -15,6 +15,9 @@ Comments that start with // should be replaced with code
 Comments that are surrounded by * are hints
 ******************************************************************/
 
+// gcc main.c mazesolver.c mazesolver.h  -o lab4
+
+
 /* Preprocessor directives to include libraries */
 #include "mazesolver.h"
 
@@ -30,7 +33,5 @@ int main(void)
   /* Hand off work to process function */
   process();
 
-  /* Ends main function */
-  system("pause");
   return 0;
 }
