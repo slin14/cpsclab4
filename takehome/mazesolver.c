@@ -78,11 +78,13 @@ void process()
   // }
 
   construct_shortest_path_info ( paths, paths_found, outputstring );
-  printf("Shortest path: %s\n", outputstring);
+  // printf("Shortest path: %s\n", outputstring);
+  printf("%s", outputstring);
 
   construct_cheapest_path_info ( paths, paths_found, outputstring );
-  printf("Cheapest path: %s\n", outputstring);
-  printf("Cheapest path cost: %d\n", path_cost(outputstring));
+  // printf("Cheapest path: %s\n", outputstring);
+  // printf("Cheapest path cost: %d\n", path_cost(outputstring));
+  printf("%s", outputstring);
 
   // printf("cost of 12345 = %d\n", path_cost("12345"));
 
@@ -345,13 +347,20 @@ void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbu
 {
 	int shortest_path_length = strlen(pathset[0]);
   int temp_length = shortest_path_length;
+  char temp_string[BUFFER]; // holds output for shortest/cheapest path
   for (int i = 0; i < numpaths; i++) {
     temp_length = strlen(pathset[i]);
     if (temp_length <= shortest_path_length) {
       shortest_path_length = temp_length;
-      strcpy(outputbuffer, pathset[i]);
+      strcpy(temp_string, pathset[i]);
     }
   }
+
+  strcpy(outputbuffer, "Shortest path: ");
+  strcat(outputbuffer, temp_string);
+  strcat(outputbuffer, "\n");
+
+  // ("Shortest path: %s\n", outputstring)
   // printf("construct_shortest_path_info: shortest_path_lenght = %d, shortest path = %s\n", shortest_path_length, outputbuffer);
 }
 
@@ -373,13 +382,21 @@ void construct_cheapest_path_info ( char** pathset, int numpaths, char* outputbu
 {
 	int cheapest_path_cost = path_cost(pathset[0]);
   int temp_cost = cheapest_path_cost;
+  char temp_string[BUFFER]; // holds output for shortest/cheapest path
   for (int i = 0; i < numpaths; i++) {
     temp_cost = path_cost(pathset[i]);
     if (temp_cost <= cheapest_path_cost) {
       cheapest_path_cost = temp_cost;
-      strcpy(outputbuffer, pathset[i]);
+      strcpy(temp_string, pathset[i]);
     }
   }
+  strcpy(outputbuffer, "Cheapest path: ");
+  strcat(outputbuffer, temp_string);
+  strcat(outputbuffer, "\nCheapest path cost: ");
+
+  sprintf(temp_string, "%d", cheapest_path_cost);
+  strcat(outputbuffer, temp_string);
+  strcat(outputbuffer, "\n");
 }
 
 /* End of file */
