@@ -47,7 +47,7 @@ void process()
   /* Opens and parses the maze file.  Replace the first parameter of fopen with
     different file names defined in the preprocessor section of the header file
     to test your mazesolver with our sample mazes. */
-  maze_file = fopen(MAZE3877, "r");
+  maze_file = fopen(MAZE1, "r");
 
   if (maze_file) {
 
@@ -60,7 +60,7 @@ void process()
 
   }
   else {
-    fprintf(stderr, "Unable to parse maze file: %s\n", MAZE3877);
+    fprintf(stderr, "Unable to parse maze file: %s\n", MAZE1);
     system("pause");
   }
 
@@ -86,7 +86,22 @@ void process()
 
   // printf("cost of 12345 = %d\n", path_cost("12345"));
 
-  // free(curr_path);
+  for (int i = 0; i < paths_found; i++) {
+    free(paths[i]);
+  }
+  free(paths);
+
+  for (int i = 0; i < dimension; i++) {
+    // for (int j = 0; j < dimension; j++) {
+    //   free(maze[i][j]);
+    // }
+    free(maze[i]);
+  }
+  free(maze);
+
+  free(path);
+
+  fclose(maze_file);
   return;
 }
 
@@ -271,7 +286,7 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
       // printf("generate_all_paths: found solution. new_path = %s, paths[%d] = %s\n", new_path, *numpathsref-1, (*pathsetref)[*numpathsref-1]); 
       // strcpy(path, ""); // WRONG
 
-      // free(new_path); // ??
+      free(new_path);
 
       return;
     } else {

@@ -16,6 +16,7 @@ Comments that are surrounded by * are hints
 ******************************************************************/
 
 // gcc main.c mazesolver.c mazesolver.h  -o lab4
+// valgrind ./lab4 --leak-check=full > valgrind.rpt 2>&1
 
 
 /* Preprocessor directives to include libraries */
