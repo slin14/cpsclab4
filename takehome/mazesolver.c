@@ -36,6 +36,9 @@ void process()
   FILE* maze_file = NULL;
   maze_cell** maze = NULL;
   char outputstring[BUFFER]; // holds output for shortest/cheapest path
+  char* path = ( char* ) calloc (BUFFER, sizeof(char)); // holds current path for generate_all_paths
+  // strcpy(outputstring, "");
+  // char* path;
 
   /* Declare variables for holding generated path information */
   char** paths = NULL;
@@ -44,7 +47,7 @@ void process()
   /* Opens and parses the maze file.  Replace the first parameter of fopen with
     different file names defined in the preprocessor section of the header file
     to test your mazesolver with our sample mazes. */
-  maze_file = fopen(MAZE1, "r");
+  maze_file = fopen(MAZE3877, "r");
 
   if (maze_file) {
 
@@ -57,21 +60,34 @@ void process()
 
   }
   else {
-    fprintf(stderr, "Unable to parse maze file: %s\n", MAZE1);
+    fprintf(stderr, "Unable to parse maze file: %s\n", MAZE3877);
     system("pause");
   }
 
   /* Traverses maze and generates all solutions */
   // INSERT YOUR CODE HERE (1 line)
-  generate_all_paths( &paths, &paths_found, maze, dimension, 0, 0, "" );
+  generate_all_paths( &paths, &paths_found, maze, dimension, 0, 0, path);
 
   /* Calculates and displays required data */
   // INSERT YOUR CODE HERE
   printf("Total number of solutions: %d\n", paths_found);
+
+  // printf("Printing paths...\n");
+  // for (int i = 0; i < paths_found; i++) {
+  //   printf("%s\n", paths[i]);
+  // }
+
   construct_shortest_path_info ( paths, paths_found, outputstring );
   printf("Shortest path: %s\n", outputstring);
-  // printf("Cheapest path: %d\n", );
-  // printf("Cheapest path cost: %d\n", );
+
+  construct_cheapest_path_info ( paths, paths_found, outputstring );
+  printf("Cheapest path: %s\n", outputstring);
+  printf("Cheapest path cost: %d\n", path_cost(outputstring));
+
+  // printf("cost of 12345 = %d\n", path_cost("12345"));
+
+  // free(curr_path);
+  return;
 }
 
 /*
@@ -196,7 +212,8 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 	char* new_point  = NULL;
 	char* new_path   = NULL;
 
-  // printf("generate_all_paths row = %d, col = %d\n", row, column);
+  // printf("generate_all_paths: row = %d, col = %d\n", row, column);
+  
 
   /* Checks for base cases */
   if (row < 0 || row >= dimension || column < 0 || column >= dimension) { 
@@ -223,14 +240,23 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 		6. concatenate new point to new path */	
   else {
 	  path_length = strlen( path );
-	  new_path = ( char * ) calloc( path_length + 2, sizeof( char ) );
+
+    // printf("path_length =  %d, path = %s\n", path_length, path);
+    
+
+
+	  new_path  = ( char * ) calloc( path_length + 2, sizeof( char ) );
 	  new_point = ( char * ) calloc( 2, sizeof( char ) );
 	  new_point[0] = maze[row][column].character;
 	  if ( path_length ) {
 		  new_path = strcat( new_path, path );
 	  }
+
 	  new_path = strcat( new_path, new_point );
     free(new_point);
+
+    // strcpy(path, new_path); // WRONG
+    // printf("generate_all_paths: row = %d, col = %d, new_path = %s, path = %s\n", row, column, new_path, path);
 
     if ( column == ( dimension - 1 ) ) {
 	    /* 1. Reallocate memory in global paths array to make room
@@ -241,6 +267,12 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
       (*pathsetref)[*numpathsref] = ( char* ) calloc( strlen( new_path ) + 1, sizeof( char ));
 	    strcpy( (*pathsetref)[*numpathsref], new_path );
 	    (*numpathsref)++;
+
+      // printf("generate_all_paths: found solution. new_path = %s, paths[%d] = %s\n", new_path, *numpathsref-1, (*pathsetref)[*numpathsref-1]); 
+      // strcpy(path, ""); // WRONG
+
+      // free(new_path); // ??
+
       return;
     } else {
 		  /* 1. Mark point as visited
@@ -248,10 +280,10 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 			   3. Mark point as unvisited */
       // INSERT CODE HERE (6 lines)
       maze[row][column].visited = 'v';
-      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column-1, path ); // left
-      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column+1, path ); // right
-      generate_all_paths( pathsetref, numpathsref, maze, dimension, row-1, column, path ); // up
-      generate_all_paths( pathsetref, numpathsref, maze, dimension, row+1, column, path ); // down
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column-1, new_path ); // left
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row, column+1, new_path ); // right
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row-1, column, new_path ); // up
+      generate_all_paths( pathsetref, numpathsref, maze, dimension, row+1, column, new_path ); // down
       maze[row][column].visited = 'u';
 		  return;
     }
@@ -271,8 +303,12 @@ void generate_all_paths( char*** pathsetref, int* numpathsref, maze_cell** maze,
 int path_cost ( char* path_string )
 {
   int cost = 0;
+  // char temp_str[2];
 	for (int i = 0; path_string[i] != '\0'; i++) {
-    cost = cost + (int)path_string[i];
+    cost = cost + (int)path_string[i] - 48; // convert from ascii to int
+    // strcpy(temp_str, path_string[i]);
+    // cost = cost + atoi(temp_str);
+    // printf("path_cost: path_string = %s, cost = %d\n", path_string, cost);
   }
   
   return cost;
@@ -293,12 +329,15 @@ int path_cost ( char* path_string )
 void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbuffer )
 {
 	int shortest_path_length = strlen(pathset[0]);
+  int temp_length = shortest_path_length;
   for (int i = 0; i < numpaths; i++) {
-    if (strlen(pathset[i]) < shortest_path_length) {
+    temp_length = strlen(pathset[i]);
+    if (temp_length <= shortest_path_length) {
+      shortest_path_length = temp_length;
       strcpy(outputbuffer, pathset[i]);
     }
   }
-  printf("construct_shortest_path_info: shortest path = %s\n", outputbuffer);
+  // printf("construct_shortest_path_info: shortest_path_lenght = %d, shortest path = %s\n", shortest_path_length, outputbuffer);
 }
 
 /*
@@ -317,7 +356,15 @@ void construct_shortest_path_info ( char** pathset, int numpaths, char* outputbu
  */
 void construct_cheapest_path_info ( char** pathset, int numpaths, char* outputbuffer )
 {
-	// INSERT CODE HERE
+	int cheapest_path_cost = path_cost(pathset[0]);
+  int temp_cost = cheapest_path_cost;
+  for (int i = 0; i < numpaths; i++) {
+    temp_cost = path_cost(pathset[i]);
+    if (temp_cost <= cheapest_path_cost) {
+      cheapest_path_cost = temp_cost;
+      strcpy(outputbuffer, pathset[i]);
+    }
+  }
 }
 
 /* End of file */
